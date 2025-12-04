@@ -1,0 +1,58 @@
+# GitHub Actions Workflow for an hourly scheduled restart mechanism.
+# This setup ensures the bot runs for a maximum of 60 minutes (1 hour)
+# and is automatically restarted by the scheduler every hour, preventing
+# long-term stability issues like memory leaks.
+
+name: Hourly Bot Restart (Timeout: 60 Minutes)
+
+# Define when the workflow should run.
+on:
+  # 1. Schedule: Run automatically at the start of every hour (0th minute).
+  schedule:
+    # The cron expression '0 * * * *' means: At minute 0 of every hour.
+    - cron: '0 * * * *' 
+  
+  # 2. Push: Also allow manual runs or triggering on code push to the main branch.
+  push:
+    branches:
+      - main
+
+jobs:
+  # The main job for running the bot process.
+  restarting_bot:
+    runs-on: ubuntu-latest
+    
+    # CRITICAL: Set the maximum runtime for this job to 60 minutes (1 hour).
+    # If the process is still running after 60 minutes, GitHub will terminate it.
+    timeout-minutes: 60 
+
+    steps:
+      - name: Checkout Repository Code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js Environment (Version 20)
+        # Based on your README, we use Node.js version 20.
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' 
+          
+      - name: Install Dependencies
+        # Installs packages specified in your package.json
+        run: npm install 
+        
+      # The main step: Run the bot for up to 60 minutes.
+      - name: Run WhatsApp Bot (Up to 60 Minutes Max)
+        # ⚠️ IMPORTANT: Replace 'npm start' with the actual command to run your bot 
+        # (e.g., 'node index.js', if different).
+        # This process will run until it finishes or until the 'timeout-minutes' limit is reached.
+        run: |
+          echo "Starting ASITHA MD V5 Bot for a fresh 60-minute session."
+          npm start 
+
+      - name: Log Completion Status
+        # This step only executes if the 'npm start' command exits naturally 
+        # (which is unlikely for a bot, but good practice).
+        # If the job times out, this step is skipped.
+        if: success()
+        run: echo "Bot process finished successfully before the 60-minute timeout."
+
