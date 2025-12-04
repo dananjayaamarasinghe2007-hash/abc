@@ -1,0 +1,28 @@
+name: Hourly Bot Restart
+
+on:
+  schedule:
+    # සෑම පැයකම (විනාඩි 0 දී) ක්‍රියාත්මක වේ
+    - cron: '0 * * * *'
+  # ඔබට අවශ්‍ය විටෙක Manual Run කිරීමට
+  workflow_dispatch:
+
+jobs:
+  restart_server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connect via SSH and Restart Bot
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            # ඔබේ Bot ෆෝල්ඩරයේ path එක නිවැරදි දැයි තහවුරු කරගන්න
+            cd /root/ASITHA-MD-V5/abc-main
+            
+            # PM2 මගින් Bot එක Restart කරන්න
+            npm restart
+￼Enter
