@@ -51,4 +51,4 @@ jobs:
       - name: Log Completion Status
         # This step only executes if the 'npm start' command exits naturally 
         if: success()
-        run: echo "Bot process finished successfully before the 60-minute timeout."￼Enter
+        run: echo "Bot process finished successfully before the 60-minute timeout."
